@@ -1,12 +1,6 @@
 import platform
 import torch
 
-# TODO:
-#  deploy on Ubuntu full code looking at Roboflow post
-#  check if we can go for another pytorch version with MPS enabled for my local environment
-#  develop with VS code container
-#  test that training works --> make it train
-#  refactor code and push on GitHub
 
 print(f"torch version is {torch.__version__}")
 
