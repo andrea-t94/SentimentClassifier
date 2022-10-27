@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# PLA   ESE NOTE: it works on installing Docker on Ubuntu 22.04. Not tested on other systems
+
 sudo apt update
 # dependencies
 sudo apt-get install \
