@@ -1,3 +1,9 @@
+
+# deploy on Ubuntu full code looking at Roboflow post
+# create loval env
+# test that training works --> make it train
+# refactor code and push on GitHub
 # implement CI/CD
 # description of how to bootstrap remote server
 # create local environment for when to develop on Mac with MPS
+# fix install NVIDIA drivers in Ubuntu sh
