@@ -1,20 +1,16 @@
-# Since there is no support for MacOS systems as well as for MPS in general, Docker is useless on my current setup for training
-
+# CPU Only, no support still for MPS and MacOs in general, going for remote NVIDIA workstation
 FROM arm64v8/python:3.9.14-slim
 
 COPY transformer transformer
 COPY datasets datasets
-COPY requirements.txt requirements.txt
-COPY test.py test.py
+COPY test_GPU.py test_GPU.py
+COPY main.py main.py
 
 
 # TODO: use poetry since for Linux pip seems to have more support
-# CPU Only, no support still for MPS and MacOs in general
+
 RUN pip3 install torch==1.11.0 torchtext==0.12.0 torchdata==0.3.0
 RUN pip3 install  whylogs==1.1.7
+RUN python3 test_GPU.py
 
-# TODO: make it multi-arch and enable CUDA GPUs support (on X86 arch)
-# When CUDA 11.6
-
-
-CMD [ "python3", "./test.py"]
+CMD [ "python3", "./main.py"]
