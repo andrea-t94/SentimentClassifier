@@ -1,23 +1,23 @@
 #!/bin/bash
 
+sudo apt update
 # dependencies
 sudo apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
     gnupg-agent \
-    software-properties-common
+    software-properties-common -y
 # add docker official GPG key
-sudo mkdir -p /etc/apt/keyrings
- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg-
+# Since Ubuntu 22.04 is yet to be officially released, add the repository for Ubuntu 20.04 Stable.
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
 # then add their repo
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+
 # finally install it
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-# create the docker group
-sudo groupadd docker
+sudo apt install docker-ce docker-ce-cli containerd.io -y
+
 # add your user to the docker group
 sudo usermod -aG docker $USER
+newgrp docker
