@@ -1,0 +1,5 @@
+whylogs==1.1.8
+whylogs[viz]
+mlflow==1.29.0
+boto3==1.24.92
+# to add pytorch
