@@ -8,6 +8,8 @@ import torch
 #  test that training works --> make it train
 #  refactor code and push on GitHub
 
+print(f"torch version is {torch.__version__}")
+
 if torch.cuda.is_available():
     print(f"CUDA version {(torch.version.cuda)} is available with {torch.cuda.device_count()} devices")
     if torch.backends.cudnn.version():
