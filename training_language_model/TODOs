@@ -1,6 +1,6 @@
 
-# fix mps not existing for torch version 1.11, look for combo of toch 1.12 torchtext and torchdata
 # finish deployment on Ubuntu and update README
+# test with remote SSH and container Dev
 # train on Wiki103 and save weights
 # refactor code and push on GitHub
 # description of how to bootstrap remote server

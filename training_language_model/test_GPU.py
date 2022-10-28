@@ -1,4 +1,5 @@
 import platform
+import warnings
 import torch
 
 
@@ -10,15 +11,18 @@ if torch.cuda.is_available():
         print(f"cuDNN version {torch.backends.cudnn.version()} is also available")
     else:
         print(f"no cuDNN")
-if not torch.backends.mps.is_available():
-    if not torch.backends.mps.is_built():
-        print("MPS not available because the current PyTorch install was not "
-              "built with MPS enabled.")
+try:
+    if not torch.backends.mps.is_available():
+        if not torch.backends.mps.is_built():
+            print("MPS not available because the current PyTorch install was not "
+                "built with MPS enabled.")
+        else:
+            print("MPS not available because the current MacOS version is not 12.3+ "
+                "and/or you do not have an MPS-enabled device on this machine.")
     else:
-        print("MPS not available because the current MacOS version is not 12.3+ "
-              "and/or you do not have an MPS-enabled device on this machine.")
-else:
-    print("MPS is available.")
+        print("MPS is available.")
+except:
+    warnings.warn(f"current pytorch version {torch.__version__} doesn't support MPS backend")
 
 
 ## STEPS:

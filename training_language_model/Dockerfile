@@ -6,7 +6,7 @@ COPY ./datasets datasets
 COPY ./training_language_model .
 
 RUN pip3 install -r requirements.txt
-RUN pip3 install torch==1.12.0 torchtext==0.12.0 torchdata==0.4.0
+RUN pip3 install torch==1.11.0 torchtext==0.11.0 torchdata==0.3.0
 # TODO: doesn't make sense to print GPU enabled here because it works when to run
 RUN python3 test_GPU.py
 

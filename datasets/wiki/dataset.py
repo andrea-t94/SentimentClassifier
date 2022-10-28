@@ -14,7 +14,7 @@ class WikiVocabulary():
 
     def _create_vocab(self):
         # create vocabulary tokenizing raw text
-        train_iter = WikiText2(split='train')
+        train_iter = WikiText103(split='train')
         vocab = build_vocab_from_iterator(map(self.tokenizer, train_iter), specials=['<unk>'])
         vocab.set_default_index(vocab['<unk>'])
         if self.save_path:
