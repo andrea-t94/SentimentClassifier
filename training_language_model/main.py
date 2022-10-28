@@ -3,6 +3,9 @@ import time
 import math
 from warnings import warn
 from typing import Tuple
+import os
+
+# mlflow and S3
 import mlflow
 import mlflow.pytorch
 import boto3
@@ -96,6 +99,10 @@ def checkpoint(model: nn.Module,
                loss: float,
                path: str
                ) -> None:
+    if not os.path.isdir(path):
+        os.makedirs(path)
+        print(f"The new {path} directory is created!")
+
     torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
@@ -222,7 +229,7 @@ def main():
 
         # checkpointing
         if epoch % n_epochs_to_checkpoint == 0:
-            checkpoint(model, optimizer, epoch, val_loss, f'{model_path}/epoch_{epoch}')
+            checkpoint(model, optimizer, epoch, val_loss, f'{model_path}/epoch_{epoch}/')
             checkpoint(model, optimizer, epoch, val_loss, f'{model_path}/latest_model/')
             # TODO: add in documentation both Mlflow and here
             #  add mlflow log model in checkpoint funtion
