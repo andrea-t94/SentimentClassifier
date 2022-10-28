@@ -1,9 +1,10 @@
 
-# finish deployment on Ubuntu and update README
 # test with remote SSH and container Dev
 # train on Wiki103 and save weights
-# refactor code and push on GitHub
+# improve MLflow logging and cleanup old experiments, do we really need checkpointing in docker (or at least mount a volumn of the artifacts) since already in S3 by MLflow?
+# refactor code looking at TODOs
 # description of how to bootstrap remote server
 # create local environment for when to develop on Mac with MPS
 # fix install NVIDIA drivers in Ubuntu sh
 # if Pytorch not working with torch data, start from a NVIDIA container without pytorch
+# final training
