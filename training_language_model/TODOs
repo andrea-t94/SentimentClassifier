@@ -1,10 +1,12 @@
 
-# test with remote SSH and container Dev
-# train on Wiki103 and save weights
-# improve MLflow logging and cleanup old experiments, do we really need checkpointing in docker (or at least mount a volumn of the artifacts) since already in S3 by MLflow?
+
+# find dataset to train second step language model and third step sentiment classification
+# train second step + third step for sentiment classification
+# train Bert model from HuggingFace and compare results against mine
+# test resume training and allow to choose the run to retrain, not only the latest
 # refactor code looking at TODOs
-# description of how to bootstrap remote server
+# eliminate MPS check that is not working with current PyTorch
+# description of how to bootstrap remote server (https://blog.roboflow.com/nvidia-docker-vscode-pytorch/)
 # create local environment for when to develop on Mac with MPS
 # fix install NVIDIA drivers in Ubuntu sh
 # if Pytorch not working with torch data, start from a NVIDIA container without pytorch
-# final training

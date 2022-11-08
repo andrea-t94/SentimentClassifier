@@ -13,7 +13,7 @@ import boto3
 # torch
 import torch
 from torch import nn, Tensor, device
-from torchtext.datasets import WikiText2
+from torchtext.datasets import WikiText2, WikiText103
 from torchtext.data.utils import get_tokenizer
 
 # custom
@@ -92,36 +92,6 @@ def evaluate(eval_data: Tensor,
     return total_loss / (len(eval_data) - 1)
 
 
-# TODO: make checkpoint dictionary a standard to be used to both checkpoint and load_checkpoint
-def checkpoint(model: nn.Module,
-               optimizer: torch.optim,
-               epoch: int,
-               loss: float,
-               path: str
-               ) -> None:
-    if not os.path.isdir(path):
-        os.makedirs(path)
-        print(f"The new {path} directory is created!")
-
-    torch.save({
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss
-    }, f"{path}model.pt")
-
-
-def load_checkpoint(path: str) -> Tuple:  # it will become class checkpoint
-    checkpoint = torch.load(path)
-    loss = checkpoint['loss']
-    epoch = checkpoint['epoch']
-    model_state_dict = checkpoint['model_state_dict']
-    optimizer_state_dict = checkpoint['optimizer_state_dict']
-
-    return model_state_dict, optimizer_state_dict, epoch, loss
-
-
-
 def main():
 
     # Check that MPS is available
@@ -136,30 +106,40 @@ def main():
 
     # inputs
     # TODO: shouldn't be embedded here, probably to put on a scheduler input (ZenML?) or as yml
-    batch_size = 20  # 64
-    eval_batch_size = 10  # 32
+    batch_size = 32  # 64
+    eval_batch_size = 16  # 32
     bptt = 35  # 128  # backpropagation through time
     emsize = 200  # embedding dimension
-    d_hid = 200  # dimension of the feedforward network model in nn.TransformerEncoder
-    nlayers = 2  # 6  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
-    nhead = 2  # 8  # number of heads in nn.MultiheadAttention
+    d_hid = 768  # dimension of the feedforward network model in nn.TransformerEncoder
+    nlayers = 6  # 6  # number of nn.TransformerEncoderLayer in nn.TransformerEncoder
+    nhead = 8  # 8  # number of heads in nn.MultiheadAttention
     dropout = 0.2  # dropout probability
-    epochs = 5
-    n_epochs_to_checkpoint = 5
+    epochs = 9
+    n_epochs_to_checkpoint = 3
     model_path = "transformer/artifacts"
     resume_training = False
+    tags = {
+        "model.name": "Pytorch Transformer",
+        "model.version": "1.0.0",
+        "step": "language model training",
+        "dataset": "WikiText103"
+        }
+
 
     # tracking server
     # TODO: embed as env vars in Docker
     # TODO: make it as decision to log metrics on MLflow if users has MLflow instance
     mlflow.set_tracking_uri('http://ec2-13-59-144-81.us-east-2.compute.amazonaws.com')
     mlflow.set_experiment(experiment_name='transformer_sentiment_classification')
-    last_run_id = None
+    # Set a batch of tags
+    mlflow.set_tags(tags)
+    run_id = None
 
     # dataset
     tokenizer = get_tokenizer(tokenizer='basic_english')
     vocab = WikiVocabulary(tokenizer=tokenizer, save_path='datasets/wiki/artifacts').get_vocab()
-    train_iter, val_iter, test_iter = WikiText2()
+    mlflow.log_artifact("datasets/wiki/artifacts/vocab.pth", artifact_path="datasets/wiki/artifacts")
+    train_iter, val_iter, test_iter = WikiText103()
     # batches of shape [seq_len, batch_size]
     train_data = batchify(data_process(train_iter, vocab, tokenizer), batch_size).to(device)
     val_data = batchify(data_process(val_iter, vocab, tokenizer), eval_batch_size).to(device)
@@ -180,21 +160,10 @@ def main():
     # training
     best_val_loss = float('inf')
     best_model = None
-    starting_epoch = 1
 
-    # TODO: refactor code to be more concise
-    # Please note: we can only resume latest training, both for constraints on training and logging on MLflow run
-    if resume_training:
-        # last trained model
-        model_state_dict, optimizer_state_dict, epoch, val_loss = load_checkpoint(f'{model_path}/latest_model/model.pt')
-        model.load_state_dict(model_state_dict)
-        optimizer.load_state_dict(optimizer_state_dict)
-        starting_epoch = epoch
-        # best trained model
-        best_model_state_dict, _, _, best_val_loss = load_checkpoint(f'{model_path}/best_model/model.pt')
-        best_model = copy.deepcopy(model).load_state_dict(best_model_state_dict)
+       
         # FIXME
-        last_run_id = mlflow.last_active_run().info.run_id  # can only take latest
+        #last_run_id = mlflow.last_active_run().info.run_id  # can only take latest
 
     # TODO: should be embedded in the same input of the input vars
     params_to_log = {
@@ -211,16 +180,22 @@ def main():
     'optimizer': optimizer,
     'scheduler': scheduler
     }
+    
+    mlflow.end_run()
+    if resume_training:
+        # TODO: add the possibility to restart other old runs and test this
+        run_id=mlflow.last_active_run()
+        model_uri = f"runs:/{run_id}/{model_path}/latest_model/"
+        model = mlflow.pytorch.load_model(model_uri).to(device)
 
-    mlflow.start_run(run_id=last_run_id)
+    mlflow.start_run()
     mlflow.log_params(params_to_log)
     for epoch in range(starting_epoch, epochs + 1):
         epoch_start_time = time.time()
         train(train_data, bptt, model, criterion, ntokens, optimizer, scheduler, epoch, device)
         val_loss = evaluate(val_data, bptt, model, criterion, ntokens, device)
         val_ppl = math.exp(val_loss)
-        # TODO: add logging on train for train losses
-        mlflow.log_metrics({'val_loss': val_loss, 'val_ppl': val_ppl})  # log at each checkpoint
+        mlflow.log_metrics({'val_loss': val_loss, 'val_ppl': val_ppl}, step=epoch)  # log at each checkpoint
         elapsed = time.time() - epoch_start_time
         print('-' * 89)
         print(f'| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | '
@@ -229,8 +204,6 @@ def main():
 
         # checkpointing
         if epoch % n_epochs_to_checkpoint == 0:
-            checkpoint(model, optimizer, epoch, val_loss, f'{model_path}/epoch_{epoch}/')
-            checkpoint(model, optimizer, epoch, val_loss, f'{model_path}/latest_model/')
             # TODO: add in documentation both Mlflow and here
             #  add mlflow log model in checkpoint funtion
             # Please note: in order to be able to log the artifacts you must:
@@ -254,11 +227,12 @@ def main():
     # evaluate the best model on the test dataset
     test_loss = evaluate(test_data, bptt, best_model, criterion, ntokens, device)
     test_ppl = math.exp(test_loss)
-    mlflow.log_metrics({'test_loss': test_loss, 'test_ppl': test_ppl})
+    mlflow.log_metrics({'test_loss': test_loss, 'test_ppl': test_ppl},step=epoch)
     print('=' * 89)
     print(f'| End of training | test loss {test_loss:5.2f} | '
           f'test ppl {test_ppl:8.2f}')
     print('=' * 89)
+    mlflow.end_run()
 
 if __name__ == '__main__':
     main()
