@@ -1,12 +1,19 @@
 
 
-# find dataset to train second step language model and third step sentiment classification
-# train second step + third step for sentiment classification
-# train Bert model from HuggingFace and compare results against mine
+# create TwitterAPI extractor for batching
+# find/load/create Twitter annotator for our model (pytorch) and RoBertA
+# training/test dataset creation and processing (batch)
+# train second step mine + RoBertA 
+# use https://huggingface.co/datasets/carblacac/twitter-sentiment-analysis for 3rd step
+# third step for sentiment classification
+# compare results 
 # test resume training and allow to choose the run to retrain, not only the latest
 # refactor code looking at TODOs
 # eliminate MPS check that is not working with current PyTorch
 # description of how to bootstrap remote server (https://blog.roboflow.com/nvidia-docker-vscode-pytorch/)
 # create local environment for when to develop on Mac with MPS
 # fix install NVIDIA drivers in Ubuntu sh
-# if Pytorch not working with torch data, start from a NVIDIA container without pytorch
+# deploy chosen model (batch pipeline)
+# add performance monitoring on MLflow
+# for later: try streaming pipeline (also need Twitter extractor and annotator in streaming)
+# add streaming monitoring of performance on MLflow
