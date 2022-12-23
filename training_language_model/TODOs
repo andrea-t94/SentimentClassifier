@@ -1,6 +1,6 @@
 
 
-# create TwitterAPI extractor for batching
+# create TwitterAPI extractor for batching (https://towardsdatascience.com/how-to-extract-data-from-the-twitter-api-using-python-b6fbd7129a33)
 # find/load/create Twitter annotator for our model (pytorch) and RoBertA
 # training/test dataset creation and processing (batch)
 # train second step mine + RoBertA 
