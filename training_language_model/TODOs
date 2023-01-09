@@ -6,7 +6,7 @@
 # train second step mine + RoBertA 
 # use https://huggingface.co/datasets/carblacac/twitter-sentiment-analysis for 3rd step
 # third step for sentiment classification
-# compare results 
+# compare results and test against greed-feat BTC index
 # test resume training and allow to choose the run to retrain, not only the latest
 # refactor code looking at TODOs
 # eliminate MPS check that is not working with current PyTorch
