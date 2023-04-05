@@ -29,5 +29,4 @@ RUN git clone https://huggingface.co/datasets/$HF_USER/$DATASET_VERSION
 
 #RUN pip3 install pandas
 RUN pip3 install -r requirements.txt
-RUN python3 test_GPU.py
-CMD [ "python3", "./test.py"]
+CMD [ "python3", "./main.py"]
