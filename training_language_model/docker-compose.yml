@@ -1,0 +1,42 @@
+# command docker-compose build --build-arg DIRPATH={DIRPATH} --build-arg HF_USER={HF_USER} --build-arg DATASET_VERSION={DATASET_VERSION}
+# will trigger the use of DIRPATH for the DockerFile
+
+version: "3.9"
+services:
+  training_clf:
+    build:
+      context: ./fine_tuning_clf
+      args:
+        DIRPATH: ${DIRPATH}
+        HF_USER: ${HF_USER}
+        DATASET_VERSION: ${DATASET_VERSION}
+        MODEL_VERSION_CLF: ${MODEL_VERSION_CLF}
+    volumes:
+      - ./:/workspace/data
+    environment:
+      - HF_USER=${HF_USER}
+      - DIRPATH=${DIRPATH} 
+      - HF_TOKEN=${HF_TOKEN}
+      - GITHUB_USER=
+      - MODEL_VERSION_MLM=${MODEL_VERSION_MLM}
+      - MODEL_VERSION_CLF=${MODEL_VERSION_CLF}
+      - DATASET_VERSION=${DATASET_VERSION}
+  
+  training_mlm:
+    build:
+      context: ./fine_tuning_mlm
+      args:
+        DIRPATH: ${DIRPATH}
+        HF_USER: ${HF_USER}
+        DATASET_VERSION: ${DATASET_VERSION}
+        MODEL_VERSION_MLM: ${MODEL_VERSION_MLM}
+    volumes:
+      - ./:/workspace/data
+    environment:
+      - HF_USER=${HF_USER}
+      - DIRPATH=${DIRPATH} 
+      - HF_TOKEN=${HF_TOKEN}
+      - GITHUB_USER=
+      - MODEL_VERSION_MLM=${MODEL_VERSION_MLM}
+      - MODEL_VERSION_CLF=${MODEL_VERSION_CLF}
+      - DATASET_VERSION=${DATASET_VERSION}
