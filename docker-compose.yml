@@ -1,0 +1,30 @@
+# command docker-compose build --build-arg DIRPATH={DIRPATH} --build-arg HF_USER={HF_USER} --build-arg DATASET_VERSION={DATASET_VERSION}
+# will trigger the use of DIRPATH for the DockerFile
+
+version: "3.9"
+services:
+  training_clf:
+    image: andret94/training_language_model-training_clf
+    volumes:
+      - ./:/workspace/data
+    environment:
+      - HF_USER=${HF_USER}
+      - DIRPATH=${DIRPATH} 
+      - HF_TOKEN=${HF_TOKEN}
+      - GITHUB_USER=
+      - MODEL_VERSION_MLM=${MODEL_VERSION_MLM}
+      - MODEL_VERSION_CLF=${MODEL_VERSION_CLF}
+      - DATASET_VERSION=${DATASET_VERSION}
+  
+  training_mlm:
+    image: andret94/training_language_model-training_mlm
+    volumes:
+      - ./:/workspace/data
+    environment:
+      - HF_USER=${HF_USER}
+      - DIRPATH=${DIRPATH} 
+      - HF_TOKEN=${HF_TOKEN}
+      - GITHUB_USER=
+      - MODEL_VERSION_MLM=${MODEL_VERSION_MLM}
+      - MODEL_VERSION_CLF=${MODEL_VERSION_CLF}
+      - DATASET_VERSION=${DATASET_VERSION}

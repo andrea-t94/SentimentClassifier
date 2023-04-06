@@ -7,12 +7,6 @@ COPY requirements.txt ./requirements.txt
 COPY main.py ./main.py
 COPY test.py ./test.py
 
-
-# this is the command docker run -v $(pwd):/workspace/data docker-ml-model
-# TODO: publish the images to be used in EC2
-# TODO: modify docker compose to be able to be used on EC2 with pulled images (change volume and images reference)
-# TODO: test GPU on EC2
-# TODO: develop script that send them back to my laptop
 ARG DIRPATH
 ARG HF_USER
 ARG DATASET_VERSION

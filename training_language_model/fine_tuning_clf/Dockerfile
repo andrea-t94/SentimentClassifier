@@ -7,17 +7,13 @@ COPY requirements.txt ./requirements.txt
 COPY main.py ./main.py
 COPY test.py ./test.py
 
-
-# this is the command docker run -v $(pwd):/workspace/data docker-ml-model
-# TODO: bring on EC2 and test GPU
-# TODO: develop script that send them back to my laptop
 ARG DIRPATH
 ARG HF_USER
 ARG DATASET_VERSION
 ARG MODEL_VERSION_CLF
 
 RUN mkdir $DIRPATH
-#RUN mkdir $DIRPATH/$MODEL_VERSION_CLF
+RUN mkdir $DIRPATH/$MODEL_VERSION_CLF
 RUN mkdir $DIRPATH/models
 RUN mkdir $DIRPATH/runs
 
